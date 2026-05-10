@@ -363,7 +363,7 @@
 <div class="ts ok" id="ts"></div>
 
 <script>
-var API='https://script.google.com/macros/s/AKfycbz_aTnchusm-VP0ZEchf2k1ySjNVGyb3HMc95ZjXgfUgnoRkE1vKx6dBnxKNCzNMmCpJQ/exec';
+var API='https://script.google.com/macros/s/AKfycby9IP81r-Cozvyu1ZRGtVYTqGl4eoZbdJudYEIw6xfWcZA0da42x9SlCqtzIPFafTjEyg/exec';
 
 // ── PIN ──
 var PIN_CODE='2878';
@@ -431,11 +431,11 @@ function apiGet(params){
   return fetch(url).then(function(r){return r.json();});
 }
 function apiPost(data){
-  return fetch(API,{
-    method:'POST',
-    body:JSON.stringify(data),
-    headers:{'Content-Type':'application/json'}
-  }).then(function(r){return r.json();});
+  var params='?';
+  Object.keys(data).forEach(function(k){
+    params+=encodeURIComponent(k)+'='+encodeURIComponent(data[k])+'&';
+  });
+  return fetch(API+params).then(function(r){return r.json();});
 }
 
 // ── APP ──
