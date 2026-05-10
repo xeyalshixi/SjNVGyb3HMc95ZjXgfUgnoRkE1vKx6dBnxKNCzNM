@@ -363,8 +363,8 @@
 <div class="ts ok" id="ts"></div>
 
 <script>
-var API='https://script.google.com/macros/s/AKfycby9IP81r-Cozvyu1ZRGtVYTqGl4eoZbdJudYEIw6xfWcZA0da42x9SlCqtzIPFafTjEyg/exec';
-
+var API='https://script.google.com/macros/s/AKfycbyCSi8JQdtmmNw1W_-XBSe27U9oBKwmDPuD4lE5HnJEV0hcmJ78tTFpDNbYTKO8i-WovQ/exec';
+  
 // ── PIN ──
 var PIN_CODE='2878';
 var pv='',pfails=0,pround=0,plockUntil=0,ptotalSec=0,ptmr=null;
@@ -425,17 +425,36 @@ function ptick(){
 function pp(n){return String(n).padStart(2,'0');}
 
 // ── API ──
-function apiGet(params){
-  var url=API+'?action=load';
-  if(params) url+='&'+params;
-  return fetch(url).then(function(r){return r.json();});
+var API='https://script.google.com/macros/s/AKfycbyCSi8JQdtmmNw1W_-XBSe27U9oBKwmDPuD4lE5HnJEV0hcmJ78tTFpDNbYTKO8i-WovQ/exec';
+
+function jsonp(params){
+  return new Promise(function(resolve,reject){
+    var cb='cb_'+Date.now();
+    var s=document.createElement('script');
+    var url=API+'?callback='+cb;
+    Object.keys(params).forEach(function(k){
+      url+='&'+encodeURIComponent(k)+'='+encodeURIComponent(params[k]);
+    });
+    window[cb]=function(data){
+      delete window[cb];
+      document.head.removeChild(s);
+      resolve(data);
+    };
+    s.onerror=function(){
+      delete window[cb];
+      document.head.removeChild(s);
+      reject(new Error('JSONP xətası'));
+    };
+    s.src=url;
+    document.head.appendChild(s);
+  });
+}
+
+function apiGet(){
+  return jsonp({action:'load'});
 }
 function apiPost(data){
-  var params='?';
-  Object.keys(data).forEach(function(k){
-    params+=encodeURIComponent(k)+'='+encodeURIComponent(data[k])+'&';
-  });
-  return fetch(API+params).then(function(r){return r.json();});
+  return jsonp(data);
 }
 
 // ── APP ──
